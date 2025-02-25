@@ -1,6 +1,7 @@
-flask==2.0.1
-flask-cors==3.0.10
-ultralytics==8.0.0
-opencv-python==4.8.0.74
-numpy==1.24.3
-firebase-admin==6.2.0
+flask==3.0.2          # Última versão estável
+flask-cors==4.0.0     # Última versão estável
+ultralytics==8.2.0    # Suporte melhorado para Python 3.12
+opencv-python==4.9.0.80  # Compatível com Python 3.12
+numpy==1.26.4         # Suporte completo para Python 3.12
+firebase-admin==6.3.0 # Compatível com Python 3.12
+pyOpenSSL==24.0.0     # Última versão estável

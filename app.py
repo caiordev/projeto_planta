@@ -74,4 +74,4 @@ def show_plant_info(plant_name):
         return f"Erro ao acessar o banco de dados: {e}", 500
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000, ssl_context=('cert.pem', 'key.pem'))

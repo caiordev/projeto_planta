@@ -1,18 +1,64 @@
 const video = document.querySelector("video");
 const captureBtn = document.getElementById("capture-btn");
-const processedImage = document.getElementById("processed-image");
-const infoBtn = document.getElementById("info-btn");
+const processingScreen = document.getElementById("processing-screen");
+const capturedImage = document.getElementById("captured-image");
+const detectionBox = document.querySelector(".detection-box");
+const feedbackModal = new bootstrap.Modal(document.getElementById('feedbackModal'));
 
-let detectedPlantName = "";
+let currentStream = null;
 
-navigator.mediaDevices.getUserMedia({ video: true })
-    .then(stream => {
+// Função para iniciar a câmera
+async function startCamera(facingMode = 'environment') {
+    try {
+        if (currentStream) {
+            currentStream.getTracks().forEach(track => track.stop());
+        }
+
+        const constraints = {
+            video: {
+                facingMode: facingMode,
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
+            }
+        };
+
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        currentStream = stream;
         video.srcObject = stream;
-        video.play();
-    })
-    .catch(error => {
-        console.log("Erro ao acessar a câmera:", error);
-    });
+        await video.play();
+    } catch (error) {
+        console.error("Erro ao acessar a câmera:", error);
+        alert("Erro ao acessar a câmera. Por favor, certifique-se de que seu navegador tem permissão para usar a câmera.");
+    }
+}
+
+// Função para mostrar a tela de processamento
+function showProcessingScreen(imageData) {
+    capturedImage.src = imageData;
+    processingScreen.classList.add('show');
+    
+    // Simular o aparecimento da caixa de detecção após um breve delay
+    setTimeout(() => {
+        const imageWidth = capturedImage.offsetWidth;
+        const imageHeight = capturedImage.offsetHeight;
+        
+        // Posicionar a caixa de detecção no centro da imagem
+        detectionBox.style.width = `${imageWidth * 0.8}px`;
+        detectionBox.style.height = `${imageHeight * 0.8}px`;
+        detectionBox.style.left = `${imageWidth * 0.1}px`;
+        detectionBox.style.top = `${imageHeight * 0.1}px`;
+        detectionBox.classList.add('show');
+    }, 500);
+}
+
+// Função para esconder a tela de processamento
+function hideProcessingScreen() {
+    processingScreen.classList.remove('show');
+    detectionBox.classList.remove('show');
+}
+
+// Iniciar com a câmera traseira por padrão
+startCamera();
 
 captureBtn.addEventListener("click", async () => {
     const canvas = document.createElement("canvas");
@@ -23,9 +69,10 @@ captureBtn.addEventListener("click", async () => {
     context.drawImage(video, 0, 0);
 
     const imageData = canvas.toDataURL("image/jpeg");
+    showProcessingScreen(imageData);
 
     try {
-        const response = await fetch("http://localhost:5000/process", {
+        const response = await fetch("/process", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -38,20 +85,20 @@ captureBtn.addEventListener("click", async () => {
         }
 
         const data = await response.json();
-        const processedImageData = data.processed_image;
-        detectedPlantName = data.plant_name;
+        const detectedPlantName = data.plant_name;
 
-        processedImage.src = processedImageData;
-        processedImage.style.display = "block";
+        if (detectedPlantName === "Nenhuma planta detectada") {
+            hideProcessingScreen();
+            feedbackModal.show();
+        } else {
+            // Aguardar um momento para mostrar a animação da caixa de detecção
+            setTimeout(() => {
+                window.location.href = `/info/${detectedPlantName}`;
+            }, 1500);
+        }
     } catch (error) {
         console.error("Erro:", error);
-    }
-});
-
-infoBtn.addEventListener("click", () => {
-    if (detectedPlantName) {
-        window.location.href = `/info/${detectedPlantName}`;
-    } else {
-        alert("Nenhuma planta detectada. Tire uma foto primeiro.");
+        hideProcessingScreen();
+        alert("Erro ao processar a imagem. Por favor, tente novamente.");
     }
 });

@@ -39,15 +39,6 @@
                             <p class="card-text">{{ plant.familia }}</p>
                         </div>
 
-                        <!-- Luminosidade -->
-                        <div class="mb-4">
-                            <h3 class="card-title">
-                                <i class="fas fa-sun me-2"></i>
-                                Luminosidade
-                            </h3>
-                            <p class="card-text">{{ plant.luminosidade }}</p>
-                        </div>
-
                         <!-- Porte -->
                         <div class="mb-4">
                             <h3 class="card-title">
@@ -57,18 +48,6 @@
                             <p class="card-text">{{ plant.porte }}</p>
                         </div>
 
-                        <!-- Origem -->
-                        <div class="mb-4">
-                            <h3 class="card-title">
-                                <i class="fas fa-globe-americas me-2"></i>
-                                Origem
-                            </h3>
-                            <ul class="list-unstyled">
-                                {% for local in plant.origem %}
-                                    <li><i class="fas fa-map-marker-alt me-2"></i>{{ local }}</li>
-                                {% endfor %}
-                            </ul>
-                        </div>
 
                         <!-- Usos -->
                         <div class="mb-4">
@@ -76,11 +55,7 @@
                                 <i class="fas fa-hand-holding-heart me-2"></i>
                                 Usos
                             </h3>
-                            <ul class="list-unstyled">
-                                {% for uso in plant.uso %}
-                                    <li><i class="fas fa-check me-2"></i>{{ uso }}</li>
-                                {% endfor %}
-                            </ul>
+                            <p class="card-text">{{ plant.usos }}</p>
                         </div>
                     </div>
                 </div>
